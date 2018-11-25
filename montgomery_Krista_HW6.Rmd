@@ -1,0 +1,143 @@
+---
+title: 'Volatile Organic Compounds and Air Quality '
+author: 'Krista M. Montgomery '
+---
+
+#Introduction 
+
+Humans can be exposed to toxins by ingestion, dermal contact, and inhalation. Inhalation of particulate matter and gasses have been a primary public health concern. Outdoor ambient air quality has been a significant emphasis on air quality research in the past decade, but in recent years it has been revealed that people spend more time indoors. 
+
+Volatile organic compounds, also known as VOCs, are emitted as gases from certain solids or liquids. Volatile means that these chemicals evaporate or can easily get into the air at room temperature and organic means these chemicals are carbon-based.VOCs refer to a group of chemicals and each VOC chemical has its own toxicity and potential for causing different health effects.
+
+In general, chronic health effects provoked by VOCs can be classified as either non-carcinogenic or carcinogenic.These health outcomes include but are not limited to; acute and chronic respiratory effects, neurological toxicity, lung cancer, and eye and throat irritation. These health outcomes are a primary concern in children, people with respiratory problems, and pregnant women. In extreme cases long term exposure may also cause damage to the liver, kidneys or central nervous system. These VOCs are produced from organic chemicals that are widely used as ingredients in household products such as; paints, varnishes, cleaning, disinfecting,  and certain cosmetics. These products can release organic compounds while you are using them, which produces VOCs. Most people are not impacted by by short-term exposure to VOCs in home. The biggest concern and gaps in research is understanding the associated health outcomes for people with lifetime exposure.
+
+Within the CSV there is information pertainging to the indoor and outdoor concentrations and the year they were collected. In addition to that each house had several samples throughout a four year spand. There are 32 VOCs with monitored concentration levels. 
+
+
+
+#A. DATA PREPARATION
+1. This data was collected in homes within East New Orleans. It was collected by a  environmental chemist. The chemist collected and created the excel sheet. The information includes the 11 homes that were monitored.The concentration of each VOC was recorded by date. 
+
+2. The data set was filtered and cleaned with R.
+
+Tidy data is by organizing by location(The location represents indoors or outdoors).
+Here you have the data being organized 
+
+```{r}
+library(tidyverse)
+
+voc <- read.csv("data/ecology_project.csv", stringsAsFactors= TRUE)
+voc<-filter(voc,Batch!="") #gets rid of data that has empy spaces
+voc$Location[voc$Location=="IN "]<-"IN"
+voc$Location[voc$Location=="OUT "]<-"OUT" #helps get rid out data that is messy 
+voc$Location<-factor(voc$Location,levels=c("IN","OUT"))
+```
+
+#B. EXPLORATION
+
+Approximately thirty-two concerning VOCs will be analyzed, VOCs such as benzene, hexane, chloroform, and toluene. The research will aim to test the correlations of a concentration of VOC in this data set. The second objective of this research is to look at the correlations between indoor and outdoor concentrations.I hypothesize that the concentrations of VOCs will be higher in homes than outdoors.
+```{r}
+str(voc)
+
+
+voc_tdy<-voc %>% 
+  gather( key = "VOC", "concentration", "ACbutdie":"MDnaphth") %>%
+  filter(VOC=="ACdchben"| VOC=="ACbenzen"|VOC=="ACtoluen"| VOC=="AChexane"| VOC=="ACmebnz"| VOC=="ACtouluen")
+
+```
+Goal:The overallof this project is to look an the correlations between inside and outdoor concerntrations of VOCs in East New Orleans. Although some VOCs have high concentrations they do not necesary demonstrate that there is a risk of advere health outcomes. In order to understand the magnitude of the problem an environmental risk assessment was conducted and the results demontrated that bezene and chloform have high risk indoors and outdoors. I also wanted to create a graph that test the correlation between benzene and chloroform inside and outdoors concentrations. 
+
+STEP 1: In order to see what VOCS have the highest concentration the mean of each VOC was calculated.
+
+Create a Boxplot to understand the concentrations of VOCs indoors Vs. Outdoors. Not all 32 of the VOCs are concerning. The VOCs I selected are the ones with the highest mean concentrations. 
+
+```{r}
+mean_voc_ACnaphth<-mean(voc$ACnaphth)
+mean_voc_ACdchben<-mean(voc$ACdchben)
+mean_voc_ACtmebzn<-mean(voc$ACtmebzn)
+mean_voc_ACdlimo<-mean(voc$ACdlimo)
+mean_voc_ACtmebnz<-mean(voc$ACtmebnz)
+mean_voc_ACbepin <-mean(voc$ACbepin)
+mean_voc_ACetmebz<-mean(voc$ACetmebz)
+mean_voc_ACtmebez<-mean(voc$ACtmebez)
+mean_voc_ACdecane<-mean(voc$ACdecane)
+mean_voc_ACalpin<-mean(voc$ACalpin)
+mean_voc_ACstyren<-mean(voc$ACstyren)
+mean_voc_Acoxyle<-mean(voc$Acoxyle)
+mean_voc_ACmpxyle<-mean(voc$ACmpxyle)
+mean_voc_ACnonane<-mean(voc$ACnonane)
+mean_voc_ACethben<-mean(voc$ACethben)
+mean_voc_ACtetche<-mean(voc$ACtetche)
+mean_voc_ACtoluen<-mean(voc$ACtoluen)
+mean_voc_ACtriche<-mean(voc$ACtriche)
+mean_voc_ACbenzen<-mean(voc$ACbenzen)
+mean_voc_ACcartet<-mean(voc$ACcartet)
+mean_voc_ACdimepe<-mean(voc$ACdimepe)
+mean_voc_ACchlfrm <-mean(voc$ACchlfrm)
+mean_voc_ACmeetke<-mean(voc$ACmeetke)
+mean_voc_ACmecype<-mean(voc$ACchlpre)
+mean_voc_AChexane<-mean(voc$AChexane)
+mean_voc_ACmtbe<-mean(voc$ACmtbe)
+mean_voc_ACmetchl<-mean(voc$ACmetchl)
+mean_voc_ACisopre<-mean(voc$ACisopre)
+mean_voc_ACpentan<-mean(voc$ACpentan)
+mean_voc_ACbutdie<-mean(voc$ACbutdie)
+```
+
+Step 2:Make a boxplot for ACdchben ACdlimo ACpentan ACmebnz ACtouluen since they have the highest mean concentrations. 
+```{r}
+
+ggplot(data=voc_tdy)+
+  geom_boxplot(mapping = aes(x=VOC, y=concentration,fill=Location))+
+  scale_y_log10()#removes zeros in concentrations not defined values log scales
+
+```
+
+Step 3: Although some VOCs have high concentrations they do not necesary demonstrate that there is a risk of advere health outcomes. In order to understand the magnitude of the problem a environmental risk assessment was tabulated using risk assessment progrom RISK on Excel and it results demontrate that bezene and chloform have high  cancer risk indoors and outdoors. I wanted to create a graph that test the correlation between benzene and chloroform inside and outdoors concentrations. 
+
+Make a scatterplot of Benzene vs Chlroform(inside vs outdoors)
+
+`
+```{r}
+ggplot(data=voc, mapping=aes(x=ACchlfrm, y=ACbenzen, color=Location ))+ geom_point()+xlab("Chlorform")+ylab("Benzene")
+```
+
+Step 4: Create a boxblot to compare concerntrations of Chlorform and Benzene indoors and outdoors. 
+
+```{r}
+voc_tdy_2<-voc %>% 
+  gather( key = "VOC", "concentration", "ACbutdie":"MDnaphth") %>%
+  filter(VOC=="ACbenzen"| VOC=="ACbenzen")
+```
+
+```{r}
+
+ggplot(data=voc_tdy_2)+
+  geom_boxplot(mapping = aes(x=VOC, y=concentration,fill=Location))+
+  scale_y_log10()#removes zeros in concentrations not defined values log scales
+
+```
+
+
+#C. ANALYSIS
+
+Test the correlation between Benzene and Chlorform usig anova, and T-test. 
+Goal:
+Run a t-test between chlorform and benzene. 
+```{r}
+t.test(voc$ACchlfrm, voc$ACbenzen)
+
+```
+From the T-test it can conclude that there is a significant difference between the means. There is a significant relationship between Chloroform and Benzene. The P value is greater than the alpha value.
+
+Goal:Do an anova summary.
+
+```{r}
+Group_1<-c(voc$ACchlfrm)
+Group_2<-c(voc$ACbenzen)
+combined_voc<-data.frame(cbind(Group_1, Group_2))
+stackgroups<-stack(combined_voc)
+anova_results<-aov(values~ind, data=stackgroups)
+summary(anova_results)
+```
+Summary:From this Anova analysis it can conclude that there is a significant difference between the means of chlroform and benzene. There is significant relationship between Chloroform and Benzene.
